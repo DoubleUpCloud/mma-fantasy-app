@@ -8,7 +8,7 @@ import Box from '@mui/material/Box';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import './globals.css';
-
+import AuthStatus from '@/components/auth/AuthStatus';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -30,7 +30,6 @@ const theme = createTheme({
   },
 });
 
-
 export default function RootLayout({
   children,
 }: {
@@ -49,7 +48,7 @@ export default function RootLayout({
                 minHeight: '100vh',
               }}
             >
-              <Navbar />
+              <Navbar isLoggedIn={AuthStatus().isLoggedIn} />
               <Box component="main" sx={{ flexGrow: 1 }}>
                 {children}
               </Box>
