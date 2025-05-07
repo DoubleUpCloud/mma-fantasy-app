@@ -10,29 +10,7 @@ import {
   Paper
 } from '@mui/material';
 import BoutPrediction from './BoutPrediction';
-
-interface Bout {
-  id: number;
-  event_id: number;
-  fighter_left_id: number;
-  fighter_right_id: number;
-  left_fighter: string;
-  right_fighter: string;
-  left_record: string;
-  right_record: string;
-  created_at: string;
-  updated_at: string;
-}
-
-interface Event {
-  id: number;
-  created_at: string;
-  name: string;
-  date: string;
-  location: string;
-  updated_at: string;
-  bouts: Bout[];
-}
+import { Event, Bout } from '@/models';
 
 interface Prediction {
   boutId: number;
@@ -61,8 +39,8 @@ export default function EventPredictions({ event }: EventPredictionsProps) {
 
   const handleSubmit = async () => {
     // Validate that all bouts have predictions
-    const missingPredictions = event.bouts.some(bout => !predictions[bout.id]);
-    
+    const missingPredictions = event.bouts?.some(bout => !predictions[bout.id]) || false;
+
     if (missingPredictions) {
       setAlertState({
         open: true,
@@ -113,7 +91,7 @@ export default function EventPredictions({ event }: EventPredictionsProps) {
   };
 
   const predictionCount = Object.keys(predictions).length;
-  const totalBouts = event.bouts.length;
+  const totalBouts = event.bouts?.length || 0;
 
   return (
     <Box sx={{ mt: 4 }}>

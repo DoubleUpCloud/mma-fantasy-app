@@ -15,15 +15,7 @@ import {
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { fetchEvents } from '@/lib/api';
-
-interface Event {
-  id: number;
-  created_at: string;
-  name: string;
-  date: string;
-  location: string;
-  updated_at: string;
-}
+import { Event } from '@/models';
 
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);

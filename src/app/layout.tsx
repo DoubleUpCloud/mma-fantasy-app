@@ -9,6 +9,7 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import './globals.css';
 import AuthStatus from '@/components/auth/AuthStatus';
+import { UserProvider } from '@/context/UserContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -41,19 +42,21 @@ export default function RootLayout({
         <AppRouterCacheProvider>
           <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                minHeight: '100vh',
-              }}
-            >
-              <Navbar isLoggedIn={AuthStatus().isLoggedIn} />
-              <Box component="main" sx={{ flexGrow: 1 }}>
-                {children}
+            <UserProvider>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  minHeight: '100vh',
+                }}
+              >
+                <Navbar isLoggedIn={AuthStatus().isLoggedIn} />
+                <Box component="main" sx={{ flexGrow: 1 }}>
+                  {children}
+                </Box>
+                <Footer />
               </Box>
-              <Footer />
-            </Box>
+            </UserProvider>
           </ThemeProvider>
         </AppRouterCacheProvider>
       </body>

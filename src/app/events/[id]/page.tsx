@@ -1,28 +1,6 @@
 import { fetchEventById } from '@/lib/api';
 import EventDetail from '@/components/events/EventDetail';
-
-interface Bout {
-  id: number;
-  event_id: number;
-  fighter_left_id: number;
-  fighter_right_id: number;
-  left_fighter: string;
-  right_fighter: string;
-  left_record: string;
-  right_record: string;
-  created_at: string;
-  updated_at: string;
-}
-
-interface Event {
-  id: number;
-  created_at: string;
-  name: string;
-  date: string;
-  location: string;
-  updated_at: string;
-  bouts: Bout[];
-}
+import { Event } from '@/models';
 
 export default async function EventDetailPage({ params }: { params: any }) {
   const eventId = parseInt(params.id);

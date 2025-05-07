@@ -17,29 +17,9 @@ import {
 import { ArrowBack } from '@mui/icons-material';
 import Link from 'next/link';
 import EventPredictions from '@/components/predictions/EventPredictions';
-
-interface Bout {
-  id: number;
-  event_id: number;
-  fighter_left_id: number;
-  fighter_right_id: number;
-  left_fighter: string;
-  right_fighter: string;
-  left_record: string;
-  right_record: string;
-  created_at: string;
-  updated_at: string;
-}
-
-interface Event {
-  id: number;
-  created_at: string;
-  name: string;
-  date: string;
-  location: string;
-  updated_at: string;
-  bouts: Bout[];
-}
+import EventBetting from '@/components/betting/EventBetting';
+import { useUser } from '@/context/UserContext';
+import { Event, Bout } from '@/models';
 
 interface EventDetailProps {
   event: Event | null;
@@ -82,6 +62,7 @@ const formatDate = (dateString: string) => {
 
 export default function EventDetail({ event, error }: EventDetailProps) {
   const [tabValue, setTabValue] = useState(0);
+  const { user, isLoading: userLoading } = useUser();
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -122,6 +103,7 @@ export default function EventDetail({ event, error }: EventDetailProps) {
             <Tabs value={tabValue} onChange={handleTabChange} aria-label="event tabs">
               <Tab label="Fight Card" id="event-tab-0" aria-controls="event-tabpanel-0" />
               <Tab label="Make Predictions" id="event-tab-1" aria-controls="event-tabpanel-1" />
+              <Tab label="Betting" id="event-tab-2" aria-controls="event-tabpanel-2" />
             </Tabs>
           </Box>
 
@@ -149,9 +131,9 @@ export default function EventDetail({ event, error }: EventDetailProps) {
                 >
                   <Grid container spacing={2} alignItems="center">
                     <Grid item xs={5} sx={{ textAlign: 'right' }}>
-                      <Typography variant="h6">{bout.left_fighter}</Typography>
+                      <Typography variant="h6">{bout.fighter1_name}</Typography>
                       <Chip 
-                        label={bout.left_record} 
+                        label={bout.fighter1_record} 
                         size="small" 
                         sx={{ mt: 1 }}
                       />
@@ -160,9 +142,9 @@ export default function EventDetail({ event, error }: EventDetailProps) {
                       <Typography variant="h6" color="text.secondary">VS</Typography>
                     </Grid>
                     <Grid item xs={5} sx={{ textAlign: 'left' }}>
-                      <Typography variant="h6">{bout.right_fighter}</Typography>
+                      <Typography variant="h6">{bout.fighter2_name}</Typography>
                       <Chip 
-                        label={bout.right_record} 
+                        label={bout.fighter2_record} 
                         size="small" 
                         sx={{ mt: 1 }}
                       />
@@ -179,6 +161,20 @@ export default function EventDetail({ event, error }: EventDetailProps) {
 
           <TabPanel value={tabValue} index={1}>
             <EventPredictions event={event} />
+          </TabPanel>
+
+          <TabPanel value={tabValue} index={2}>
+            {user ? (
+              <EventBetting event={event} userId={user.id} />
+            ) : userLoading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                <Typography>Loading user information...</Typography>
+              </Box>
+            ) : (
+              <Alert severity="info">
+                Please log in to place bets.
+              </Alert>
+            )}
           </TabPanel>
         </Box>
       )}
