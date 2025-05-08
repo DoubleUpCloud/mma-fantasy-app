@@ -24,6 +24,7 @@ import { Event, Bout } from '@/models';
 interface EventDetailProps {
   event: Event | null;
   error: string | null;
+  isEnded: boolean | null;
 }
 
 interface TabPanelProps {
@@ -60,7 +61,7 @@ const formatDate = (dateString: string) => {
   });
 };
 
-export default function EventDetail({ event, error }: EventDetailProps) {
+export default function EventDetail({ event, error, isEnded }: EventDetailProps) {
   const [tabValue, setTabValue] = useState(0);
   const { user, isLoading: userLoading } = useUser();
 
@@ -99,14 +100,22 @@ export default function EventDetail({ event, error }: EventDetailProps) {
             Location: {event.location}
           </Typography>
 
+          {isEnded ? (
           <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 4 }}>
             <Tabs value={tabValue} onChange={handleTabChange} aria-label="event tabs">
               <Tab label="Fight Card" id="event-tab-0" aria-controls="event-tabpanel-0" />
-              <Tab label="Make Predictions" id="event-tab-1" aria-controls="event-tabpanel-1" />
               <Tab label="Betting" id="event-tab-2" aria-controls="event-tabpanel-2" />
             </Tabs>
           </Box>
-
+          )
+          :
+          (
+            <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 4 }}>
+            <Tabs value={tabValue} onChange={handleTabChange} aria-label="event tabs">
+              <Tab label="Fight Card" id="event-tab-0" aria-controls="event-tabpanel-0" />
+            </Tabs>
+          </Box>
+          )}
           <TabPanel value={tabValue} index={0}>
             <Typography variant="h5" gutterBottom>
               Fight Card
@@ -139,7 +148,14 @@ export default function EventDetail({ event, error }: EventDetailProps) {
                       />
                     </Grid>
                     <Grid item xs={2} sx={{ textAlign: 'center' }}>
-                      <Typography variant="h6" color="text.secondary">VS</Typography>
+                      
+                        {isEnded ? (
+                            <Typography variant="h6" color="text.secondary">VS</Typography>
+                          ) : (
+                            <Typography variant="h6" color="green">{bout.result!.winner_name} {bout.result!.details}</Typography>
+                          )
+                        }
+                      
                     </Grid>
                     <Grid item xs={5} sx={{ textAlign: 'left' }}>
                       <Typography variant="h6">{bout.fighter2_name}</Typography>
@@ -160,10 +176,6 @@ export default function EventDetail({ event, error }: EventDetailProps) {
           </TabPanel>
 
           <TabPanel value={tabValue} index={1}>
-            <EventPredictions event={event} />
-          </TabPanel>
-
-          <TabPanel value={tabValue} index={2}>
             {user ? (
               <EventBetting event={event} userId={user.id} />
             ) : userLoading ? (

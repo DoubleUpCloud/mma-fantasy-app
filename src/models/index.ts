@@ -50,7 +50,7 @@ export interface Bout {
   is_main_event: boolean;
   is_title_fight: boolean;
   status: string;
-  result?: Result[];
+  result?: Result;
   created_at: string;
 
 }

@@ -29,7 +29,7 @@ export default function EventsPage() {
       try {
         const data = await fetchEvents();
         setEvents(data);
-        setDisplayEvents(data.filter(e => new Date(e.date) > new Date()));
+        setDisplayEvents(data.filter((e: Event) => new Date(e.date) > new Date()));
       } catch (err) {
         setError('Failed to load events. Please try again later.');
         console.error(err);
