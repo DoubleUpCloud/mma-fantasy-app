@@ -27,6 +27,16 @@ export interface UserBet {
 /**
  * Represents a bout (fight) between two fighters
  */
+
+export interface Result {
+  winner_id: number;
+  winner_name: string;
+  bet_type: string;
+  round: number;
+  time: string;
+  details: string;
+}
+
 export interface Bout {
   id: number;
   event_id: number;
@@ -40,8 +50,9 @@ export interface Bout {
   is_main_event: boolean;
   is_title_fight: boolean;
   status: string;
-  result?: string;
+  result?: Result[];
   created_at: string;
+
 }
 
 /**
@@ -68,4 +79,6 @@ export interface Event {
   status: string;
   created_at: string;
   bouts?: Bout[];
+
 }
+
