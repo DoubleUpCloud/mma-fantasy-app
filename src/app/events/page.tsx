@@ -22,12 +22,14 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const [displayEvents, setDisplayEvents] = useState<Event[]>([])
 
   useEffect(() => {
     const getEvents = async () => {
       try {
         const data = await fetchEvents();
         setEvents(data);
+        setDisplayEvents(data.filter(e => new Date(e.date) > new Date()));
       } catch (err) {
         setError('Failed to load events. Please try again later.');
         console.error(err);
@@ -51,11 +53,48 @@ export default function EventsPage() {
     });
   };
 
+  const setEventsDisplay = (mode: boolean) => {
+    if (mode) {
+      const displayEvents = events.filter(e => new Date(e.date) > new Date());
+      setDisplayEvents(displayEvents)
+    } else {
+      const displayEvents = events.filter(e => new Date(e.date) < new Date());
+      setDisplayEvents(displayEvents)
+    }
+  }
+
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom>
         MMA Events
       </Typography>
+      
+        <Box display="flex" gap={2} pt={2} pb={2}>
+          <Typography 
+          variant="h6"
+          sx={{
+            cursor: 'pointer',
+            transition: 'color 0.3s ease',
+            '&:hover': {
+              color: 'gray',
+            },
+          }}
+          onClick={() => setEventsDisplay(true)}>
+          Upcomming Events
+          </Typography>
+          <Typography 
+          variant="h6"
+          sx={{
+            cursor: 'pointer',
+            transition: 'color 0.3s ease',
+            '&:hover': {
+              color: 'gray',
+            },
+          }}
+          onClick={() => setEventsDisplay(false)}>
+          Ended Events
+          </Typography>
+        </Box>
 
       {loading ? (
         <Grid container spacing={3}>
@@ -81,7 +120,7 @@ export default function EventsPage() {
         </Alert>
       ) : (
         <Grid container spacing={3}>
-          {events.map((event) => (
+          {displayEvents.map((event) => (
             <Grid item xs={12} sm={6} md={4} key={event.id}>
               <Card>
                 <CardActionArea onClick={() => handleEventClick(event.id)}>
