@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { 
-  Box, 
-  Typography, 
-  Paper, 
-  List, 
-  ListItem, 
-  ListItemText, 
-  Divider, 
+import {
+  Box,
+  Typography,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
   Chip,
   CircularProgress,
   Alert
@@ -17,11 +17,10 @@ import { UserBet, BetType } from '@/models';
 import { betService } from '@/lib/betService';
 
 interface UserBetsProps {
-  userId: string;
-  boutId?: number; // Optional: to filter bets for a specific bout
+  boutId?: number;
 }
 
-export default function UserBets({ userId, boutId }: UserBetsProps) {
+export default function UserBets({ boutId }: UserBetsProps) {
   const [bets, setBets] = useState<UserBet[]>([]);
   const [betTypes, setBetTypes] = useState<Record<number, BetType>>({});
   const [loading, setLoading] = useState(true);
@@ -31,7 +30,7 @@ export default function UserBets({ userId, boutId }: UserBetsProps) {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
+
         // Fetch bet types first
         const types = await betService.getAllBetTypes();
         const typesMap: Record<number, BetType> = {};
@@ -39,20 +38,16 @@ export default function UserBets({ userId, boutId }: UserBetsProps) {
           typesMap[type.id] = type;
         });
         setBetTypes(typesMap);
-        
+
         // Fetch user bets
         let userBets: UserBet[];
         if (boutId) {
           // If boutId is provided, fetch bets for that bout
           userBets = await betService.getBoutBets(boutId);
           // Filter for the current user
-          userBets = userBets.filter(bet => bet.user_id === userId);
-        } else {
-          // Otherwise, fetch all bets for the user
-          userBets = await betService.getUserBets(userId);
+
         }
-        
-        setBets(userBets);
+
       } catch (err) {
         console.error('Error fetching user bets:', err);
         setError('Failed to load bets. Please try again later.');
@@ -62,7 +57,7 @@ export default function UserBets({ userId, boutId }: UserBetsProps) {
     };
 
     fetchData();
-  }, [userId, boutId]);
+  }, [boutId]);
 
   if (loading) {
     return (
@@ -91,10 +86,10 @@ export default function UserBets({ userId, boutId }: UserBetsProps) {
       <Typography variant="h6" gutterBottom>
         Your Bets
       </Typography>
-      
+
       <List>
         {bets.map((bet, index) => (
-          <Box key={`${bet.user_id}-${bet.bout_id}-${bet.bet_type_id}`}>
+          <Box key={`${bet}-${bet.bout_id}-${bet.bet_type_id}`}>
             {index > 0 && <Divider component="li" />}
             <ListItem alignItems="flex-start">
               <ListItemText
@@ -110,18 +105,18 @@ export default function UserBets({ userId, boutId }: UserBetsProps) {
                     </Typography>
                     <Box sx={{ mt: 1 }}>
                       {bet.result !== undefined && (
-                        <Chip 
-                          label={bet.result ? "Won" : "Lost"} 
-                          color={bet.result ? "success" : "error"} 
-                          size="small" 
+                        <Chip
+                          label={bet.result ? "Won" : "Lost"}
+                          color={bet.result ? "success" : "error"}
+                          size="small"
                         />
                       )}
                       {bet.result === undefined && (
-                        <Chip 
-                          label="Pending" 
-                          color="primary" 
-                          variant="outlined" 
-                          size="small" 
+                        <Chip
+                          label="Pending"
+                          color="primary"
+                          variant="outlined"
+                          size="small"
                         />
                       )}
                     </Box>
