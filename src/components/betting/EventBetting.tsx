@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Typography, 
-  Tabs, 
-  Tab, 
+import {
+  Box,
+  Typography,
+  Tabs,
+  Tab,
   Paper,
   Alert,
   CircularProgress,
@@ -43,10 +43,9 @@ function TabPanel(props: TabPanelProps) {
 
 interface EventBettingProps {
   event: Event;
-  userId: string;
 }
 
-export default function EventBetting({ event, userId }: EventBettingProps) {
+export default function EventBetting({ event }: EventBettingProps) {
   const [tabValue, setTabValue] = useState(0);
   const [userBets, setUserBets] = useState<UserBet[]>([]);
   const [loading, setLoading] = useState(false);
@@ -59,7 +58,7 @@ export default function EventBetting({ event, userId }: EventBettingProps) {
   const handleBetPlaced = (bet: UserBet) => {
     // Add the new bet to the userBets array
     setUserBets(prev => [...prev, bet]);
-    
+
     // Switch to the "Your Bets" tab
     setTabValue(1);
   };
@@ -78,9 +77,9 @@ export default function EventBetting({ event, userId }: EventBettingProps) {
     <Box sx={{ width: '100%', mt: 4 }}>
       <Paper sx={{ borderRadius: 2 }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs 
-            value={tabValue} 
-            onChange={handleTabChange} 
+          <Tabs
+            value={tabValue}
+            onChange={handleTabChange}
             aria-label="betting tabs"
             variant="fullWidth"
           >
@@ -88,7 +87,7 @@ export default function EventBetting({ event, userId }: EventBettingProps) {
             <Tab label="Your Bets" id="betting-tab-1" aria-controls="betting-tabpanel-1" />
           </Tabs>
         </Box>
-        
+
         <TabPanel value={tabValue} index={0}>
           <Typography variant="h5" gutterBottom>
             Place Your Bets
@@ -96,19 +95,18 @@ export default function EventBetting({ event, userId }: EventBettingProps) {
           <Typography variant="body1" color="text.secondary" paragraph>
             Select a bout and place your bet on the outcome.
           </Typography>
-          
+
           <Divider sx={{ my: 3 }} />
-          
+
           {event.bouts.map((bout) => (
-            <BoutBetForm 
-              key={bout.id} 
-              bout={bout} 
-              userId={userId} 
+            <BoutBetForm
+              key={bout.id}
+              bout={bout}
               onBetPlaced={handleBetPlaced}
             />
           ))}
         </TabPanel>
-        
+
         <TabPanel value={tabValue} index={1}>
           <Typography variant="h5" gutterBottom>
             Your Bets for {event.name}
@@ -116,10 +114,10 @@ export default function EventBetting({ event, userId }: EventBettingProps) {
           <Typography variant="body1" color="text.secondary" paragraph>
             View all your bets for this event.
           </Typography>
-          
+
           <Divider sx={{ my: 3 }} />
-          
-          <UserBets userId={userId} />
+
+          <UserBets />
         </TabPanel>
       </Paper>
     </Box>

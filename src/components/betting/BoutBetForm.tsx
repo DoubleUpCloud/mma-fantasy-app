@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from 'react';
-import { 
-  Box, 
-  Button, 
-  TextField, 
-  Typography, 
-  Paper, 
-  Grid, 
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Paper,
+  Grid,
   Chip,
   Alert,
   Snackbar,
@@ -19,11 +19,10 @@ import BetTypeSelector from './BetTypeSelector';
 
 interface BoutBetFormProps {
   bout: Bout;
-  userId: string;
   onBetPlaced?: (bet: UserBet) => void;
 }
 
-export default function BoutBetForm({ bout, userId, onBetPlaced }: BoutBetFormProps) {
+export default function BoutBetForm({ bout, onBetPlaced }: BoutBetFormProps) {
   const [selectedBetType, setSelectedBetType] = useState<BetType | null>(null);
   const [predictedValue, setPredictedValue] = useState('');
   const [loading, setLoading] = useState(false);
@@ -43,7 +42,7 @@ export default function BoutBetForm({ bout, userId, onBetPlaced }: BoutBetFormPr
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    
+
     if (!selectedBetType) {
       setAlertState({
         open: true,
@@ -66,31 +65,30 @@ export default function BoutBetForm({ bout, userId, onBetPlaced }: BoutBetFormPr
 
     try {
       const userBet = {
-        user_id: userId,
         bout_id: bout.id,
         bet_type_id: selectedBetType.id,
         predicted_value: predictedValue
       };
 
-      const result = await betService.createUserBet(userBet);
-      
-      if (result) {
-        setAlertState({
-          open: true,
-          message: 'Your bet has been placed successfully!',
-          severity: 'success'
-        });
-        
-        // Reset form
-        setPredictedValue('');
-        
-        // Call callback if provided
-        if (onBetPlaced) {
-          onBetPlaced(result);
-        }
-      } else {
-        throw new Error('Failed to place bet');
-      }
+      //const result = await betService.createUserBet(userBet);
+
+      // if (result) {
+      //   setAlertState({
+      //     open: true,
+      //     message: 'Your bet has been placed successfully!',
+      //     severity: 'success'
+      //   });
+
+      //   // Reset form
+      //   setPredictedValue('');
+
+      //   // Call callback if provided
+      //   if (onBetPlaced) {
+      //     onBetPlaced(result);
+      //   }
+      // } else {
+      //   throw new Error('Failed to place bet');
+      // }
     } catch (error) {
       console.error('Error placing bet:', error);
       setAlertState({
@@ -121,10 +119,10 @@ export default function BoutBetForm({ bout, userId, onBetPlaced }: BoutBetFormPr
   };
 
   return (
-    <Paper 
-      elevation={2} 
-      sx={{ 
-        p: 3, 
+    <Paper
+      elevation={2}
+      sx={{
+        p: 3,
         mb: 3,
         borderRadius: 2
       }}
@@ -136,9 +134,9 @@ export default function BoutBetForm({ bout, userId, onBetPlaced }: BoutBetFormPr
       <Grid container spacing={2} alignItems="center" sx={{ mb: 3 }}>
         <Grid item xs={5} sx={{ textAlign: 'right' }}>
           <Typography variant="subtitle1">{fighter1.name}</Typography>
-          <Chip 
-            label={fighter1.record} 
-            size="small" 
+          <Chip
+            label={fighter1.record}
+            size="small"
             sx={{ mt: 1 }}
           />
         </Grid>
@@ -147,19 +145,19 @@ export default function BoutBetForm({ bout, userId, onBetPlaced }: BoutBetFormPr
         </Grid>
         <Grid item xs={5} sx={{ textAlign: 'left' }}>
           <Typography variant="subtitle1">{fighter2.name}</Typography>
-          <Chip 
-            label={fighter2.record} 
-            size="small" 
+          <Chip
+            label={fighter2.record}
+            size="small"
             sx={{ mt: 1 }}
           />
         </Grid>
       </Grid>
 
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-        <BetTypeSelector 
+        <BetTypeSelector
           onBetTypeSelect={handleBetTypeSelect}
         />
-        
+
         <TextField
           fullWidth
           label="Your Prediction"
@@ -169,7 +167,7 @@ export default function BoutBetForm({ bout, userId, onBetPlaced }: BoutBetFormPr
           helperText={selectedBetType ? `Enter your prediction for ${selectedBetType.name}` : 'Select a bet type first'}
           disabled={!selectedBetType}
         />
-        
+
         <Button
           type="submit"
           variant="contained"

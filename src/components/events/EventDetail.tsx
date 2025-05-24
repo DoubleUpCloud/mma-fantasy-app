@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from 'react';
-import { 
-  Container, 
-  Typography, 
-  Box, 
+import {
+  Container,
+  Typography,
+  Box,
   Alert,
   Button,
   Divider,
@@ -63,17 +63,17 @@ const formatDate = (dateString: string) => {
 
 export default function EventDetail({ event, error, isEnded }: EventDetailProps) {
   const [tabValue, setTabValue] = useState(0);
-  const { user, isLoading: userLoading } = useUser();
+  const { isLogged, isLoading: userLoading } = useUser();
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
-
+  console.log(isLogged)
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Link href="/events" passHref>
-        <Button 
-          startIcon={<ArrowBack />} 
+        <Button
+          startIcon={<ArrowBack />}
           sx={{ mb: 3 }}
         >
           Back to Events
@@ -101,21 +101,21 @@ export default function EventDetail({ event, error, isEnded }: EventDetailProps)
           </Typography>
 
           {isEnded ? (
-          <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 4 }}>
-            <Tabs value={tabValue} onChange={handleTabChange} aria-label="event tabs">
-              <Tab label="Fight Card" id="event-tab-0" aria-controls="event-tabpanel-0" />
-              <Tab label="Betting" id="event-tab-2" aria-controls="event-tabpanel-2" />
-            </Tabs>
-          </Box>
-          )
-          :
-          (
             <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 4 }}>
-            <Tabs value={tabValue} onChange={handleTabChange} aria-label="event tabs">
-              <Tab label="Fight Card" id="event-tab-0" aria-controls="event-tabpanel-0" />
-            </Tabs>
-          </Box>
-          )}
+              <Tabs value={tabValue} onChange={handleTabChange} aria-label="event tabs">
+                <Tab label="Fight Card" id="event-tab-0" aria-controls="event-tabpanel-0" />
+                <Tab label="Betting" id="event-tab-2" aria-controls="event-tabpanel-2" />
+              </Tabs>
+            </Box>
+          )
+            :
+            (
+              <Box sx={{ borderBottom: 1, borderColor: 'divider', mt: 4 }}>
+                <Tabs value={tabValue} onChange={handleTabChange} aria-label="event tabs">
+                  <Tab label="Fight Card" id="event-tab-0" aria-controls="event-tabpanel-0" />
+                </Tabs>
+              </Box>
+            )}
           <TabPanel value={tabValue} index={0}>
             <Typography variant="h5" gutterBottom>
               Fight Card
@@ -124,11 +124,11 @@ export default function EventDetail({ event, error, isEnded }: EventDetailProps)
 
             {event.bouts && event.bouts.length > 0 ? (
               event.bouts.map((bout) => (
-                <Paper 
-                  key={bout.id} 
-                  elevation={2} 
-                  sx={{ 
-                    p: 3, 
+                <Paper
+                  key={bout.id}
+                  elevation={2}
+                  sx={{
+                    p: 3,
                     mb: 3,
                     borderRadius: 2,
                     transition: 'transform 0.2s',
@@ -141,27 +141,27 @@ export default function EventDetail({ event, error, isEnded }: EventDetailProps)
                   <Grid container spacing={2} alignItems="center">
                     <Grid item xs={5} sx={{ textAlign: 'right' }}>
                       <Typography variant="h6">{bout.fighter1_name}</Typography>
-                      <Chip 
-                        label={bout.fighter1_record} 
-                        size="small" 
+                      <Chip
+                        label={bout.fighter1_record}
+                        size="small"
                         sx={{ mt: 1 }}
                       />
                     </Grid>
                     <Grid item xs={2} sx={{ textAlign: 'center' }}>
-                      
-                        {isEnded ? (
-                            <Typography variant="h6" color="text.secondary">VS</Typography>
-                          ) : (
-                            <Typography variant="h6" color="green">{bout.result!.winner_name} {bout.result!.details}</Typography>
-                          )
-                        }
-                      
+
+                      {isEnded ? (
+                        <Typography variant="h6" color="text.secondary">VS</Typography>
+                      ) : (
+                        <Typography variant="h6" color="green">{bout.result!.winner_name} {bout.result!.details}</Typography>
+                      )
+                      }
+
                     </Grid>
                     <Grid item xs={5} sx={{ textAlign: 'left' }}>
                       <Typography variant="h6">{bout.fighter2_name}</Typography>
-                      <Chip 
-                        label={bout.fighter2_record} 
-                        size="small" 
+                      <Chip
+                        label={bout.fighter2_record}
+                        size="small"
                         sx={{ mt: 1 }}
                       />
                     </Grid>
@@ -176,8 +176,8 @@ export default function EventDetail({ event, error, isEnded }: EventDetailProps)
           </TabPanel>
 
           <TabPanel value={tabValue} index={1}>
-            {user ? (
-              <EventBetting event={event} userId={user.id} />
+            {isLogged ? (
+              <EventBetting event={event} />
             ) : userLoading ? (
               <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
                 <Typography>Loading user information...</Typography>
@@ -188,6 +188,7 @@ export default function EventDetail({ event, error, isEnded }: EventDetailProps)
               </Alert>
             )}
           </TabPanel>
+
         </Box>
       )}
     </Container>

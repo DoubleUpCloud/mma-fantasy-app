@@ -1,7 +1,6 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '@/lib/supabase';
 
 interface User {
   id: string;
@@ -9,15 +8,13 @@ interface User {
 }
 
 interface UserContextType {
-  user: User | null;
+  isLogged: boolean;
   isLoading: boolean;
-  error: string | null;
 }
 
 const UserContext = createContext<UserContextType>({
-  user: null,
-  isLoading: true,
-  error: null
+  isLogged: false,
+  isLoading: true
 });
 
 export const useUser = () => useContext(UserContext);
@@ -26,71 +23,29 @@ interface UserProviderProps {
   children: ReactNode;
 }
 
+function getCookie(name: string): string | null {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+  return null;
+}
+
 export const UserProvider = ({ children }: UserProviderProps) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [isLogged, setIsLogged] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        setIsLoading(true);
-        
-        // Get the current session
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError) {
-          throw sessionError;
-        }
-        
-        if (session) {
-          // Get user data
-          const { data: userData, error: userError } = await supabase.auth.getUser();
-          
-          if (userError) {
-            throw userError;
-          }
-          
-          if (userData.user) {
-            setUser({
-              id: userData.user.id,
-              email: userData.user.email || ''
-            });
-          }
-        }
-      } catch (err) {
-        console.error('Error fetching user:', err);
-        setError('Failed to fetch user information');
-      } finally {
-        setIsLoading(false);
-      }
+    const checkLogin = () => {
+      const isLoggedCookie = getCookie('is-logged');
+      setIsLogged(isLoggedCookie === 'true');
+      setIsLoading(false);
     };
 
-    fetchUser();
-
-    // Set up auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (session) {
-          setUser({
-            id: session.user.id,
-            email: session.user.email || ''
-          });
-        } else {
-          setUser(null);
-        }
-        setIsLoading(false);
-      }
-    );
-
-    // Cleanup subscription
-    return () => {
-      subscription.unsubscribe();
-    };
+    checkLogin();
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, isLoading, error }}>
+    <UserContext.Provider value={{ isLogged, isLoading }}>
       {children}
     </UserContext.Provider>
   );
