@@ -13,15 +13,15 @@ import {
   CircularProgress,
   Alert
 } from '@mui/material';
-import { UserBet, BetType } from '@/models';
+import { UserBet, BetType, UserEventBets } from '@/models';
 import { betService } from '@/lib/betService';
 
 interface UserBetsProps {
-  boutId?: number;
+  eventId?: number;
 }
 
-export default function UserBets({ boutId }: UserBetsProps) {
-  const [bets, setBets] = useState<UserBet[]>([]);
+export default function UserBets({ eventId }: UserBetsProps) {
+  const [bets, setBets] = useState<UserEventBets[]>([]);
   const [betTypes, setBetTypes] = useState<Record<number, BetType>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,11 +40,12 @@ export default function UserBets({ boutId }: UserBetsProps) {
         setBetTypes(typesMap);
 
         // Fetch user bets
-        let userBets: UserBet[];
-        if (boutId) {
+        let userBets: UserEventBets[];
+        if (eventId) {
           // If boutId is provided, fetch bets for that bout
-          userBets = await betService.getBoutBets(boutId);
+          userBets = await betService.getUserBetsForEvent(eventId);
           // Filter for the current user
+          setBets(userBets)
 
         }
 
@@ -57,7 +58,7 @@ export default function UserBets({ boutId }: UserBetsProps) {
     };
 
     fetchData();
-  }, [boutId]);
+  }, [eventId]);
 
   if (loading) {
     return (
@@ -101,10 +102,10 @@ export default function UserBets({ boutId }: UserBetsProps) {
                 secondary={
                   <>
                     <Typography component="span" variant="body2" color="text.primary">
-                      Prediction: {bet.predicted_value}
+                      Prediction: {bet.predicted_winner}
                     </Typography>
                     <Box sx={{ mt: 1 }}>
-                      {bet.result !== undefined && (
+                      {/* {bet.result !== undefined && (
                         <Chip
                           label={bet.result ? "Won" : "Lost"}
                           color={bet.result ? "success" : "error"}
@@ -118,7 +119,13 @@ export default function UserBets({ boutId }: UserBetsProps) {
                           variant="outlined"
                           size="small"
                         />
-                      )}
+                      )} */}
+                      <Chip
+                          label="Pending"
+                          color="primary"
+                          variant="outlined"
+                          size="small"
+                        />
                     </Box>
                   </>
                 }

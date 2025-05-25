@@ -11,8 +11,10 @@ import {
   Chip,
   Alert,
   Snackbar,
-  CircularProgress
+  CircularProgress,
+  SelectChangeEvent
 } from '@mui/material';
+import { Select, MenuItem, FormHelperText, FormControl, InputLabel } from '@mui/material';
 import { BetType, Bout, UserBet } from '@/models';
 import { betService } from '@/lib/betService';
 import BetTypeSelector from './BetTypeSelector';
@@ -36,8 +38,9 @@ export default function BoutBetForm({ bout, onBetPlaced }: BoutBetFormProps) {
     setSelectedBetType(betType);
   };
 
-  const handlePredictedValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPredictedValue(event.target.value);
+  const handlePredictedValueChange = (event: SelectChangeEvent<string>) => {
+    setPredictedValue(event.target.value.toString());
+    console.log(typeof(event.target.value))
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -67,28 +70,28 @@ export default function BoutBetForm({ bout, onBetPlaced }: BoutBetFormProps) {
       const userBet = {
         bout_id: bout.id,
         bet_type_id: selectedBetType.id,
-        predicted_value: predictedValue
+        predicted_winner: predictedValue
       };
 
-      //const result = await betService.createUserBet(userBet);
+      const result = await betService.createUserBet(userBet);
 
-      // if (result) {
-      //   setAlertState({
-      //     open: true,
-      //     message: 'Your bet has been placed successfully!',
-      //     severity: 'success'
-      //   });
+      if (result) {
+        setAlertState({
+          open: true,
+          message: 'Your bet has been placed successfully!',
+          severity: 'success'
+        });
 
-      //   // Reset form
-      //   setPredictedValue('');
+        // Reset form
+        setPredictedValue('');
 
-      //   // Call callback if provided
-      //   if (onBetPlaced) {
-      //     onBetPlaced(result);
-      //   }
-      // } else {
-      //   throw new Error('Failed to place bet');
-      // }
+        // Call callback if provided
+        if (onBetPlaced) {
+          onBetPlaced(result);
+        }
+      } else {
+        throw new Error('Failed to place bet');
+      }
     } catch (error) {
       console.error('Error placing bet:', error);
       setAlertState({
@@ -118,6 +121,7 @@ export default function BoutBetForm({ bout, onBetPlaced }: BoutBetFormProps) {
     record: bout.fighter2_record || 'N/A'
   };
 
+  console.log(predictedValue)
   return (
     <Paper
       elevation={2}
@@ -147,7 +151,7 @@ export default function BoutBetForm({ bout, onBetPlaced }: BoutBetFormProps) {
           <Typography variant="subtitle1">{fighter2.name}</Typography>
           <Chip
             label={fighter2.record}
-            size="small"
+            size="small"  
             sx={{ mt: 1 }}
           />
         </Grid>
@@ -157,7 +161,7 @@ export default function BoutBetForm({ bout, onBetPlaced }: BoutBetFormProps) {
         <BetTypeSelector
           onBetTypeSelect={handleBetTypeSelect}
         />
-
+{/* 
         <TextField
           fullWidth
           label="Your Prediction"
@@ -166,7 +170,22 @@ export default function BoutBetForm({ bout, onBetPlaced }: BoutBetFormProps) {
           margin="normal"
           helperText={selectedBetType ? `Enter your prediction for ${selectedBetType.name}` : 'Select a bet type first'}
           disabled={!selectedBetType}
-        />
+        /> */}
+        <FormControl fullWidth margin="normal" disabled={!selectedBetType}>
+          <InputLabel id="prediction-select-label">Your Prediction</InputLabel>
+          <Select
+            labelId="prediction-select-label"
+            value={predictedValue}
+            onChange={ (e) => handlePredictedValueChange(e)}
+            label="Your Prediction"
+          >
+            <MenuItem value={fighter1.id}>{fighter1.name}</MenuItem>
+            <MenuItem value={fighter2.id}>{fighter2.name}</MenuItem>
+          </Select>
+          <FormHelperText>
+            {selectedBetType ? `Enter your prediction for ${selectedBetType.name}` : 'Select a bet type first'}
+          </FormHelperText>
+        </FormControl>
 
         <Button
           type="submit"

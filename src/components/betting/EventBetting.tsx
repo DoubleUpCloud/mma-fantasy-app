@@ -117,7 +117,7 @@ export default function EventBetting({ event }: EventBettingProps) {
 
           <Divider sx={{ my: 3 }} />
 
-          <UserBets />
+          <UserBets eventId={event.id}/>
         </TabPanel>
       </Paper>
     </Box>

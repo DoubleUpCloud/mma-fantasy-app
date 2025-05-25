@@ -1,6 +1,7 @@
 import { supabase } from './supabase';
-import { BetType, UserBet } from '../models';
+import { BetType, UserBet, UserEventBets } from '../models';
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api';
 /**
  * Service for handling betting operations
  */
@@ -10,29 +11,30 @@ export const betService = {
    * @param betType The bet type data
    * @returns The created bet type
    */
-  async createBetType(betType: Omit<BetType, 'id' | 'created_at'>): Promise<BetType | null> {
-    try {
-      const { data, error } = await supabase
-        .from('bet_types')
-        .insert({
-          name: betType.name,
-          description: betType.description,
-          created_at: new Date().toISOString()
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error creating bet type:', error);
-        return null;
-      }
-
-      return data;
-    } catch (error) {
-      console.error('Error in createBetType:', error);
-      return null;
-    }
-  },
+  // async createBetType(betType: Omit<BetType, 'user_id' | 'created_at'>): Promise<BetType | null> {
+  //   try {
+  //     const response = await fetch(`${API_BASE_URL}/user-bets`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       credentials: 'include',
+  //       body: JSON.stringify(betType),  // ✅ Fixed here
+  //     });
+  
+  //     if (!response.ok) {
+  //       console.error('Failed to create bet type:', response.statusText);
+  //       return null;
+  //     }
+  
+  //     const createdBetType: BetType = await response.json();
+  //     return createdBetType;
+  
+  //   } catch (error) {
+  //     console.error('Error creating bet type:', error);
+  //     return null;
+  //   }
+  // },
 
   /**
    * Get all bet types
@@ -87,64 +89,28 @@ export const betService = {
    * @param userBet The user bet data
    * @returns The created user bet
    */
-  async createUserBet(userBet: Omit<UserBet, 'created_at' | 'result'>): Promise<UserBet | null> {
+  async createUserBet(betType: Omit<UserBet, 'created_at' | 'result'>): Promise<UserBet | null> {
     try {
-      // Check if the user already has a bet for this bout and bet type
-      const { data: existingBet, error: checkError } = await supabase
-        .from('user_bets')
-        .select('*')
-        .eq('user_id', userBet.user_id)
-        .eq('bout_id', userBet.bout_id)
-        .eq('bet_type_id', userBet.bet_type_id)
-        .maybeSingle();
-
-      if (checkError) {
-        console.error('Error checking existing bet:', checkError);
+      console.log(JSON.stringify(betType))
+      const response = await fetch(`${API_BASE_URL}/user-bets`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(betType),  // ✅ Fixed here
+      });
+  
+      if (!response.ok) {
+        console.error('Failed to create bet type:', response.statusText);
         return null;
       }
-
-      // If the bet already exists, update it
-      if (existingBet) {
-        const { data: updatedBet, error: updateError } = await supabase
-          .from('user_bets')
-          .update({
-            predicted_value: userBet.predicted_value
-          })
-          .eq('user_id', userBet.user_id)
-          .eq('bout_id', userBet.bout_id)
-          .eq('bet_type_id', userBet.bet_type_id)
-          .select()
-          .single();
-
-        if (updateError) {
-          console.error('Error updating user bet:', updateError);
-          return null;
-        }
-
-        return updatedBet;
-      }
-
-      // Otherwise, create a new bet
-      const { data: newBet, error: insertError } = await supabase
-        .from('user_bets')
-        .insert({
-          user_id: userBet.user_id,
-          bout_id: userBet.bout_id,
-          bet_type_id: userBet.bet_type_id,
-          predicted_value: userBet.predicted_value,
-          created_at: new Date().toISOString()
-        })
-        .select()
-        .single();
-
-      if (insertError) {
-        console.error('Error creating user bet:', insertError);
-        return null;
-      }
-
-      return newBet;
+  
+      const createdUserBet: UserBet = await response.json();
+      return createdUserBet;
+  
     } catch (error) {
-      console.error('Error in createUserBet:', error);
+      console.error('Error creating bet type:', error);
       return null;
     }
   },
@@ -204,14 +170,14 @@ export const betService = {
    * @param userBet The user bet with updated result
    * @returns The updated user bet
    */
-  async updateBetResult(userBet: Pick<UserBet, 'user_id' | 'bout_id' | 'bet_type_id' | 'result'>): Promise<UserBet | null> {
+  async updateBetResult(userBet: Pick<UserBet,  'bout_id' | 'bet_type_id' | 'result'>): Promise<UserBet | null> {
     try {
       const { data, error } = await supabase
         .from('user_bets')
         .update({
           result: userBet.result
         })
-        .eq('user_id', userBet.user_id)
+        //.eq('user_id', userBet.user_id)
         .eq('bout_id', userBet.bout_id)
         .eq('bet_type_id', userBet.bet_type_id)
         .select()
@@ -226,6 +192,26 @@ export const betService = {
     } catch (error) {
       console.error('Error in updateBetResult:', error);
       return null;
+    }
+  },
+
+  async getUserBetsForEvent(eventId: number): Promise<UserEventBets[]> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/event/${eventId}/user-bets`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch predictions');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching predictions:', error);
+      throw error;
     }
   }
 };

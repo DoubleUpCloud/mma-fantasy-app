@@ -16,12 +16,22 @@ export interface BetType {
  * Represents a bet placed by a user on a bout
  */
 export interface UserBet {
-  user_id: string;
   bout_id: number;
   bet_type_id: number;
-  predicted_value: string;
+  predicted_winner: string;
   result?: boolean | null;
   created_at: string;
+}
+
+export interface UserEventBets {
+  user_id: string,
+  bout_id: number,
+  bet_type_id: number,
+  predicted_winner: number,
+  created_at: string,
+  points: number,
+  bouts: object,
+  predicted_fighter: object
 }
 
 /**
