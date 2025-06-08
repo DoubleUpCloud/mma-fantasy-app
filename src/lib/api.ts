@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { Bout } from '@/models';
+import { Bout, Leaders } from '@/models';
 
 // Define the structure of the bout data coming from the API
 interface ApiBout {
@@ -69,6 +69,27 @@ export async function fetchFighters() {
 export async function fetchEvents() {
   try {
     const response = await fetch(`${API_BASE_URL}/events`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch events');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching events:', error);
+    throw error;
+  }
+}
+
+export async function fetchLeaders() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/leaders`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

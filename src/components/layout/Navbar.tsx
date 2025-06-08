@@ -35,20 +35,21 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
         method: "POST",
         credentials: "include",
       });
+      isLoggedIn = false
     };
 
-  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };  
+  interface MenuItem {
+    label: string;
+    href?: string;
+    onClick?: () => void;
+  }
 
-  const menuItems = isLoggedIn
+  const menuItems: MenuItem[] = isLoggedIn
   ? [
       { label: 'Predictions', href: '/predictions' },
-      { label: 'Leaderboard', href: '/leaderboard' }
+      { label: 'Leaderboard', href: '/leaderboard' },
+      { label: 'Logout', href: '/auth/login', onClick: logout }
     ]
   : [
       { label: 'Login', href: '/auth/login' },
@@ -88,69 +89,11 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
               <Button color="inherit" component={Link} href="/fighters">
                 Fighters
               </Button>
-              <Button color="inherit" component={Link} href="/about">
-                About
-              </Button>
             </Box>
           )}
 
           {/* Mobile Menu Button */}
-          {isMobile && (
-            <Box sx={{ flexGrow: 0 }}>
-              <IconButton
-                size="large"
-                edge="start"
-                color="inherit"
-                aria-label="menu"
-                onClick={handleMenu}
-              >
-                <MenuIcon />
-              </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorEl}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-              >
-                <MenuItem onClick={handleClose} component={Link} href="/">
-                  Home
-                </MenuItem>
-                <MenuItem onClick={handleClose} component={Link} href="/events">
-                  Events
-                </MenuItem>
-                <MenuItem onClick={handleClose} component={Link} href="/fighters">
-                  Fighters
-                </MenuItem>
-                <MenuItem onClick={handleClose} component={Link} href="/about">
-                  About
-                </MenuItem>
-                <MenuItem onClick={logout} component={Link} href="/">
-                  Logout
-                </MenuItem>
-                {menuItems.map((item) => (
-                    <Button 
-                      key={item.label} 
-                      color="inherit" 
-                      component={Link} 
-                      href={item.href}
-                      sx={{ ml: 1 }}
-                    >
-                      {item.label}
-                    </Button>
-                  )
-                )}
-              </Menu>
-            </Box>
-          )}
+          
 
           {/* Desktop Auth Buttons */}
           {!isMobile && (
@@ -162,6 +105,7 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
                   component={Link} 
                   href={item.href}
                   sx={{ ml: 1 }}
+                  onClick={item.onClick}
                 >
                   {item.label}
                 </Button>

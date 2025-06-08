@@ -3,7 +3,6 @@ import type { NextRequest } from 'next/server';
 
 // Define which routes require authentication
 const protectedRoutes = [
-  '/dashboard',
   '/predictions',
   '/profile',
   '/leaderboard',
@@ -31,7 +30,7 @@ export function middleware(request: NextRequest) {
   // If the user is trying to access an auth route but is already logged in
   if (authRoutes.some(route => path.startsWith(route)) && isLoggedIn) {
     // Redirect to dashboard
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+    return NextResponse.redirect(new URL('/', request.url));
   }
   
   // Otherwise, continue with the request

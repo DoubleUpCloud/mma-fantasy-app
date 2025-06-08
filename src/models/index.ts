@@ -12,6 +12,14 @@ export interface BetType {
   created_at: string;
 }
 
+export interface Leaders {
+  id: string;
+  created_at: string;
+  name: string;
+  points: number;
+  total_bets: number;
+}
+
 /**
  * Represents a bet placed by a user on a bout
  */
