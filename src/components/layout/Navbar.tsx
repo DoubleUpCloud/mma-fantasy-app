@@ -16,6 +16,9 @@ import {
 } from '@mui/material';
 import { Menu as MenuIcon, SportsMma } from '@mui/icons-material';
 import Link from 'next/link';
+//import { logout } from '@/lib/api';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api';
 
 interface NavbarProps {
   isLoggedIn?: boolean;
@@ -26,26 +29,31 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
+ // const logoutUser = logout(router);
+  const logout = async () => {
+      await fetch(`${API_BASE_URL}/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    };
+
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
   const handleClose = () => {
     setAnchorEl(null);
-  };
+  };  
 
-  const menuItems = isLoggedIn 
-    ? [
-        { label: 'Dashboard', href: '/dashboard' },
-        { label: 'Predictions', href: '/predictions' },
-        { label: 'Leaderboard', href: '/leaderboard' },
-        { label: 'Profile', href: '/profile' },
-        { label: 'Logout', href: '/auth/logout' }
-      ]
-    : [
-        { label: 'Login', href: '/auth/login' },
-        { label: 'Register', href: '/auth/register' }
-      ];
+  const menuItems = isLoggedIn
+  ? [
+      { label: 'Predictions', href: '/predictions' },
+      { label: 'Leaderboard', href: '/leaderboard' }
+    ]
+  : [
+      { label: 'Login', href: '/auth/login' },
+      { label: 'Register', href: '/auth/register' }
+    ];
 
   return (
     <AppBar position="static">
@@ -125,16 +133,21 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
                 <MenuItem onClick={handleClose} component={Link} href="/about">
                   About
                 </MenuItem>
+                <MenuItem onClick={logout} component={Link} href="/">
+                  Logout
+                </MenuItem>
                 {menuItems.map((item) => (
-                  <MenuItem 
-                    key={item.label} 
-                    onClick={handleClose} 
-                    component={Link} 
-                    href={item.href}
-                  >
-                    {item.label}
-                  </MenuItem>
-                ))}
+                    <Button 
+                      key={item.label} 
+                      color="inherit" 
+                      component={Link} 
+                      href={item.href}
+                      sx={{ ml: 1 }}
+                    >
+                      {item.label}
+                    </Button>
+                  )
+                )}
               </Menu>
             </Box>
           )}

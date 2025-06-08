@@ -87,6 +87,37 @@ export async function fetchEvents() {
   }
 }
 
+
+
+export async function getAllUserBouts() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/user-bets`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch events');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching events:', error);
+    throw error;
+  }
+}
+
+// export const logout = async (router: NextRouter) => {
+//   await fetch(`${API_BASE_URL}/logout`, {
+//     method: "POST",
+//     credentials: "include",
+//   });
+//   router.push("/auth/login");
+// };
+
 // Fetch a specific event by ID
 export async function fetchEventById(id: number) {
   try {
